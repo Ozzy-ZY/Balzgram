@@ -9,31 +9,16 @@ namespace WebProj.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(
+    IAuthService authService,
+    IJwtService jwtService,
+    IValidator<RegisterRequestDto> registerValidator,
+    IValidator<LoginRequestDto> loginValidator,
+    IValidator<ChangePasswordRequestDto> changePasswordValidator,
+    IWebHostEnvironment environment)
+    : ControllerBase
 {
-    private readonly IAuthService _authService;
-    private readonly IJwtService _jwtService;
-    private readonly IValidator<RegisterRequestDto> _registerValidator;
-    private readonly IValidator<LoginRequestDto> _loginValidator;
-    private readonly IValidator<ChangePasswordRequestDto> _changePasswordValidator;
-    private readonly IWebHostEnvironment _environment;
     private const string RefreshTokenCookieName = "refreshToken";
-
-    public AuthController(
-        IAuthService authService,
-        IJwtService jwtService,
-        IValidator<RegisterRequestDto> registerValidator,
-        IValidator<LoginRequestDto> loginValidator,
-        IValidator<ChangePasswordRequestDto> changePasswordValidator,
-        IWebHostEnvironment environment)
-    {
-        _authService = authService;
-        _jwtService = jwtService;
-        _registerValidator = registerValidator;
-        _loginValidator = loginValidator;
-        _changePasswordValidator = changePasswordValidator;
-        _environment = environment;
-    }
 
     /// <summary>
     /// Register a new user
@@ -43,7 +28,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
     {
-        var validationResult = await _registerValidator.ValidateAsync(registerDto);
+        var validationResult = await registerValidator.ValidateAsync(registerDto);
         if (!validationResult.IsValid)
         {
             return BadRequest(new AuthResponseDto
@@ -53,7 +38,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        var (response, refreshToken) = await _authService.RegisterAsync(registerDto);
+        var (response, refreshToken) = await authService.RegisterAsync(registerDto);
 
         if (!response.Success)
         {
@@ -76,7 +61,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
     {
-        var validationResult = await _loginValidator.ValidateAsync(loginDto);
+        var validationResult = await loginValidator.ValidateAsync(loginDto);
         if (!validationResult.IsValid)
         {
             return BadRequest(new AuthResponseDto
@@ -86,7 +71,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        var (response, refreshToken) = await _authService.LoginAsync(loginDto);
+        var (response, refreshToken) = await authService.LoginAsync(loginDto);
 
         if (!response.Success)
         {
@@ -119,7 +104,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        var (response, newRefreshToken) = await _authService.RefreshTokenAsync(refreshToken);
+        var (response, newRefreshToken) = await authService.RefreshTokenAsync(refreshToken);
 
         if (!response.Success)
         {
@@ -144,7 +129,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordDto)
     {
-        var validationResult = await _changePasswordValidator.ValidateAsync(changePasswordDto);
+        var validationResult = await changePasswordValidator.ValidateAsync(changePasswordDto);
         if (!validationResult.IsValid)
         {
             return BadRequest(new ChangePasswordResponseDto
@@ -161,7 +146,7 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var result = await _authService.ChangePasswordAsync(userId, changePasswordDto);
+        var result = await authService.ChangePasswordAsync(userId, changePasswordDto);
 
         if (!result.Success)
         {
@@ -185,7 +170,7 @@ public class AuthController : ControllerBase
 
         if (!string.IsNullOrEmpty(refreshToken))
         {
-            await _authService.RevokeTokenAsync(refreshToken, "User logged out");
+            await authService.RevokeTokenAsync(refreshToken, "User logged out");
         }
 
         DeleteRefreshTokenCookie();
@@ -210,7 +195,7 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var profile = await _authService.GetUserProfileAsync(userId);
+        var profile = await authService.GetUserProfileAsync(userId);
 
         if (profile == null)
         {
@@ -236,7 +221,7 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        await _authService.RevokeAllUserTokensAsync(userId, "User revoked all tokens");
+        await authService.RevokeAllUserTokensAsync(userId, "User revoked all tokens");
         DeleteRefreshTokenCookie();
 
         return Ok(new { message = "All tokens revoked successfully" });
@@ -247,9 +232,9 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = !_environment.IsDevelopment(), 
+            Secure = !environment.IsDevelopment(), 
             SameSite = SameSiteMode.Lax, // Lax allows the cookie to be sent on navigation
-            Expires = DateTime.UtcNow.AddDays(_jwtService.GetRefreshTokenExpirationDays()),
+            Expires = DateTime.UtcNow.AddDays(jwtService.GetRefreshTokenExpirationDays()),
             Path = "/", 
             IsEssential = true
         };
@@ -262,7 +247,7 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = !_environment.IsDevelopment(),
+            Secure = !environment.IsDevelopment(),
             SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddDays(-1),
             Path = "/" 
