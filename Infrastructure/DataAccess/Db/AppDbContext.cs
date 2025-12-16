@@ -11,6 +11,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<ChatMember> ChatMembers => Set<ChatMember>();
+    public DbSet<Message> Messages => Set<Message>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
