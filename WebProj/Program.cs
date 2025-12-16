@@ -2,6 +2,7 @@ using Infrastructure;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
+using WebProj.Hubs;
 
 namespace WebProj;
 
@@ -106,6 +107,7 @@ public class Program
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<ChatHub>("/hubs/chat");
 
             // Simple health endpoint
             app.MapGet("/health", async (IConfiguration config) =>
