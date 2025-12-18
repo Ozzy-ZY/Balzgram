@@ -106,7 +106,7 @@ public class Program
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapControllers();
+            app.MapControllers().RequireCors("AllowAll");
             app.MapHub<ChatHub>("/hubs/chat");
 
             // Simple health endpoint
