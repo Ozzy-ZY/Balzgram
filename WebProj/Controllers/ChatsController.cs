@@ -1,3 +1,4 @@
+using Application.DTOs;
 using Application.DTOs.Chat;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -16,8 +17,8 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("private")]
     [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChatDto>> CreatePrivateChat([FromBody] CreatePrivateChatRequestDto request, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -30,8 +31,8 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("group")]
     [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChatDto>> CreateGroupChat([FromBody] CreateGroupChatRequestDto request, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -44,10 +45,10 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("{chatId:guid}/members")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddUserToGroup(Guid chatId, [FromBody] AddUserToGroupRequestDto request, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -60,10 +61,10 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpDelete("{chatId:guid}/members/{userName}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveUserFromGroup(Guid chatId, string userName, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -76,9 +77,9 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("{chatId:guid}/leave")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LeaveGroup(Guid chatId, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -91,7 +92,7 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ChatDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IReadOnlyList<ChatDto>>> GetUserChats(CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
@@ -104,10 +105,10 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpGet("{chatId:guid}/messages")]
     [ProducesResponseType(typeof(PagedResultDto<MessageDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PagedResultDto<MessageDto>>> GetMessages(Guid chatId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
         var userId = GetCurrentUserId();
