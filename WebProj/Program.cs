@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
 using WebProj.Hubs;
+using WebProj.Middleware;
 
 namespace WebProj;
 
@@ -93,6 +94,7 @@ public class Program
             {
                 options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
             });
+            app.UseGlobalExceptionHandler();
             
             app.UseSwagger();
             app.UseSwaggerUI(c =>
