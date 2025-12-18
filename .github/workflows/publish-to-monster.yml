@@ -1,5 +1,8 @@
 name: Build, publish and deploy to MonsterASP.NET
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build_and_deploy:
