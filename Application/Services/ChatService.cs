@@ -40,6 +40,7 @@ public class ChatService : IChatService
         {
             Id = Guid.NewGuid(),
             Type = ChatType.Direct,
+            Name = $"{currentUser.UserName} & {targetUser.UserName}", // the client is responsible for displaying appropriate names
             CreatedAtUtc = DateTime.UtcNow,
             CreatedByUserId = currentUserId
         };
@@ -215,7 +216,6 @@ public class ChatService : IChatService
         var lastMessage = chat.Messages
             .OrderByDescending(m => m.SentAtUtc)
             .FirstOrDefault();
-
         return new ChatDto
         {
             Id = chat.Id,
