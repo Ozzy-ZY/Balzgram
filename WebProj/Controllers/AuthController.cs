@@ -28,16 +28,6 @@ public class AuthController(
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
     {
-        var validationResult = await registerValidator.ValidateAsync(registerDto);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new AuthResponseDto
-            {
-                Success = false,
-                Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
-
         var (response, refreshToken) = await authService.RegisterAsync(registerDto);
 
         if (!response.Success)
@@ -61,15 +51,6 @@ public class AuthController(
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
     {
-        var validationResult = await loginValidator.ValidateAsync(loginDto);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new AuthResponseDto
-            {
-                Success = false,
-                Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
 
         var (response, refreshToken) = await authService.LoginAsync(loginDto);
 
@@ -129,16 +110,6 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordDto)
     {
-        var validationResult = await changePasswordValidator.ValidateAsync(changePasswordDto);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new ChangePasswordResponseDto
-            {
-                Success = false,
-                Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         
         if (string.IsNullOrEmpty(userId))
