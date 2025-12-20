@@ -49,8 +49,10 @@ public static class DependencyInjection
 
         var jwtSettings = configuration.GetSection(JwtSettings.SectionName);
         var rateLimitingSettings = configuration.GetSection(RateLimitingSettings.SectionName);
+        var cloudinarySettings = configuration.GetSection(CloudinarySettings.SectionName);
         services.Configure<JwtSettings>(jwtSettings);
         services.Configure<RateLimitingSettings>(rateLimitingSettings);
+        services.Configure<CloudinarySettings>(cloudinarySettings);
 
         var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
         var key = Encoding.UTF8.GetBytes(secretKey);
