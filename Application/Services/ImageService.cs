@@ -65,11 +65,20 @@ public class ImageService(ICloudinaryService cloudinaryService, IImageRepository
     }
 
     public async Task<ImageDto> GetProfilePictureAsync(
-        string userId, 
+        string userIdOrUsername,
+        bool isId,
         CancellationToken cancellationToken = default)
     {
-        var image = await imageRepository.GetProfilePictureByUserIdAsync(userId, cancellationToken)
-            ?? throw new ImageNotFoundException("No profile picture found for this user");
+        Image? image;
+        if (isId)
+        {
+            image = await imageRepository.GetProfilePictureByUserIdAsync(userIdOrUsername, cancellationToken)
+                        ?? throw new ImageNotFoundException("No profile picture found for this user");
+        }
+        else
+        {
+            image = await imageRepository.GetProfilePictureByUsernameAsync(userIdOrUsername, cancellationToken);
+        }
 
         return new ImageDto(
             Id: image.Id,

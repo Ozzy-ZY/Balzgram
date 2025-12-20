@@ -68,22 +68,22 @@ public class ImageController(IImageService imageService) : ControllerBase
             return Unauthorized();
         }
 
-        var result = await imageService.GetProfilePictureAsync(userId, cancellationToken);
+        var result = await imageService.GetProfilePictureAsync(userId,true, cancellationToken);
         return Ok(result);
     }
 
     /// <summary>
     /// Get a specific user's profile picture
     /// </summary>
-    [HttpGet("profile-picture/{userId}")]
+    [HttpGet("profile-picture/{userName}")]
     [ProducesResponseType(typeof(ImageDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponseDto),StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto),StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUserProfilePicture(
-        [FromRoute] string userId,
+        [FromRoute] string userName,
         CancellationToken cancellationToken)
     {
-        var result = await imageService.GetProfilePictureAsync(userId, cancellationToken);
+        var result = await imageService.GetProfilePictureAsync(userName,false, cancellationToken);
         return Ok(result);
     }
 

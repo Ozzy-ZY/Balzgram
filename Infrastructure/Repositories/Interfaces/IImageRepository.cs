@@ -6,6 +6,7 @@ public interface IImageRepository
 {
     Task<Image?> GetByIdAsync(Guid imageId, CancellationToken cancellationToken = default);
     Task<Image?> GetProfilePictureByUserIdAsync(string userId, CancellationToken cancellationToken = default);
+    Task<Image?> GetProfilePictureByUsernameAsync(string userName, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Image>> GetImagesByUserIdAsync(string userId, CancellationToken cancellationToken = default);
     Task AddAsync(Image image, CancellationToken cancellationToken = default);
     Task<bool> SoftDeleteAsync(Guid imageId, CancellationToken cancellationToken = default);

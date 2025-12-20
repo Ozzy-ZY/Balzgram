@@ -26,6 +26,12 @@ public class ImageRepository : IImageRepository
             .OrderByDescending(i => i.CreatedAtUtc)
             .FirstOrDefaultAsync(cancellationToken);
     }
+    public Task<Image?> GetProfilePictureByUsernameAsync(string userName, CancellationToken cancellationToken = default)
+    {
+        return _context.Images
+            .Where(i => i.User!.UserName == userName && i.Type == ImageType.ProfilePicture)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 
     public async Task<IReadOnlyList<Image>> GetImagesByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
