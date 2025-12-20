@@ -17,12 +17,12 @@ public class ImageRepository : IImageRepository
     public Task<Image?> GetByIdAsync(Guid imageId, CancellationToken cancellationToken = default)
     {
         return _context.Images
-            .FirstOrDefaultAsync(i => i.Id == imageId && !i.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(i => i.Id == imageId, cancellationToken);
     }
     public Task<Image?> GetProfilePictureByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         return _context.Images
-            .Where(i => i.UserId == userId && i.Type == ImageType.ProfilePicture && !i.IsDeleted)
+            .Where(i => i.UserId == userId && i.Type == ImageType.ProfilePicture)
             .OrderByDescending(i => i.CreatedAtUtc)
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -30,7 +30,7 @@ public class ImageRepository : IImageRepository
     public async Task<IReadOnlyList<Image>> GetImagesByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         return await _context.Images
-            .Where(i => i.UserId == userId && !i.IsDeleted)
+            .Where(i => i.UserId == userId)
             .OrderByDescending(i => i.CreatedAtUtc)
             .ToListAsync(cancellationToken);
     }
@@ -43,7 +43,7 @@ public class ImageRepository : IImageRepository
     public async Task<bool> SoftDeleteAsync(Guid imageId, CancellationToken cancellationToken = default)
     {
         var image = await _context.Images
-            .FirstOrDefaultAsync(i => i.Id == imageId && !i.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(i => i.Id == imageId, cancellationToken);
 
         if (image == null)
         {
