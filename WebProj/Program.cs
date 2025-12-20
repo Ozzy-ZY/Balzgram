@@ -1,9 +1,12 @@
+using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
 using Infrastructure.Configurations;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
+using WebProj.Filters;
 using WebProj.Hubs;
 using WebProj.Middleware;
 using WebProj.RateLimiting;
@@ -37,7 +40,19 @@ public class Program
             builder.Services.AddApplication();
             builder.Services.AddInfrastructure(builder.Configuration);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+                {
+                    options.Filters.Add<ValidationFilter>();
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Optional
+                }); 
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             builder.Services.AddSignalR();
 
