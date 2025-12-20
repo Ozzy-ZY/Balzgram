@@ -1,10 +1,9 @@
 using System.Text;
-using Application;
-using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Configurations;
 using Infrastructure.DataAccess.Db;
 using Infrastructure.Repositories;
+using Infrastructure.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +17,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddApplication();
-        
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
