@@ -10,17 +10,25 @@ public class ImageService(ICloudinaryService cloudinaryService, IImageRepository
     : IImageService
 {
     private const string ProfilePictureFolder = "profile-pictures";
+    private const string TempTag = "temp";
 
     public ProfilePictureUploadSignatureResponseDto GetProfilePictureUploadSignature(string userId)
     {
-        var signature = cloudinaryService.GetUploadSignature(ProfilePictureFolder);
+        var uploadRequest = new CloudinaryUploadRequestDto(
+            Folder: ProfilePictureFolder,
+            Tags: [TempTag, $"user:{userId}"]
+        );
+        
+        var signature = cloudinaryService.GetUploadSignature(uploadRequest);
         
         return new ProfilePictureUploadSignatureResponseDto(
             Signature: signature.Signature,
             Timestamp: signature.Timestamp,
             ApiKey: signature.ApiKey,
             CloudName: signature.CloudName,
-            Folder: signature.Folder);
+            Folder: signature.Folder,
+            Tags: signature.Tags,
+            PublicId: signature.PublicId);
     }
 
     public async Task<ImageDto> SaveProfilePictureAsync(

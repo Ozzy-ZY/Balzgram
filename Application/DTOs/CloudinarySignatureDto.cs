@@ -5,4 +5,6 @@ public record CloudinarySignatureDto(
     long Timestamp,
     string ApiKey,
     string CloudName,
-    string Folder);
+    string Folder,
+    List<string> Tags,
+    string PublicId);

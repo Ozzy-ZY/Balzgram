@@ -5,7 +5,9 @@ public record ProfilePictureUploadSignatureResponseDto(
     long Timestamp,
     string ApiKey,
     string CloudName,
-    string Folder);
+    string Folder,
+    List<string> Tags,
+    string PublicId);
 
 public record SaveProfilePictureRequestDto(
     string PublicId,
