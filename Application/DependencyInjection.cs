@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
+        services.AddScoped<IImageService, ImageService>();
 
         return services;
     }
