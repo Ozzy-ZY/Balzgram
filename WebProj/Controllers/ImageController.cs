@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Application.DTOs;
 using Application.DTOs.Image;
 using Application.Interfaces;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +36,8 @@ public class ImageController(IImageService imageService) : ControllerBase
     /// </summary>
     [HttpPost("profile-picture")]
     [ProducesResponseType(typeof(ImageDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto),StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto),StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> SaveProfilePicture(
         [FromBody] SaveProfilePictureRequestDto request,

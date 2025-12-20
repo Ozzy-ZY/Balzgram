@@ -17,6 +17,7 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("private")]
     [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChatDto>> CreatePrivateChat([FromBody] CreatePrivateChatRequestDto request, CancellationToken cancellationToken)
@@ -31,6 +32,7 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("group")]
     [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChatDto>> CreateGroupChat([FromBody] CreateGroupChatRequestDto request, CancellationToken cancellationToken)
@@ -45,6 +47,7 @@ public class ChatsController(IChatService chatService, IMessageService messageSe
     /// </summary>
     [HttpPost("{chatId:guid}/members")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]

@@ -1,7 +1,7 @@
 using System.Security.Claims;
+using Application.DTOs;
 using Application.DTOs.Auth;
 using Application.Interfaces;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +12,6 @@ namespace WebProj.Controllers;
 public class AuthController(
     IAuthService authService,
     IJwtService jwtService,
-    IValidator<RegisterRequestDto> registerValidator,
-    IValidator<LoginRequestDto> loginValidator,
-    IValidator<ChangePasswordRequestDto> changePasswordValidator,
     IWebHostEnvironment environment)
     : ControllerBase
 {
@@ -25,6 +22,7 @@ public class AuthController(
     /// </summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
     {
@@ -47,6 +45,7 @@ public class AuthController(
     /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
@@ -106,6 +105,7 @@ public class AuthController(
     [HttpPost("change-password")]
     [Authorize]
     [ProducesResponseType(typeof(ChangePasswordResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ChangePasswordResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordDto)
