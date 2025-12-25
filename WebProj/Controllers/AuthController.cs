@@ -76,7 +76,11 @@ public class AuthController(
     public async Task<IActionResult> RefreshToken()
     {
         var refreshToken = Request.Cookies[RefreshTokenCookieName];
-
+        var clientType = HttpContext.Request.Headers["X-Client-Type"].ToString();
+        if (clientType == "server")
+        {
+            refreshToken = Request.Headers["Refresh-Token"].ToString();
+        }
         if (string.IsNullOrEmpty(refreshToken))
         {
             return Unauthorized(new AuthResponseDto
