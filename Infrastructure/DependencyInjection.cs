@@ -2,6 +2,7 @@ using System.Text;
 using Domain.Models;
 using Infrastructure.Configurations;
 using Infrastructure.DataAccess.Db;
+using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure;
@@ -18,8 +20,24 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        
+        // Configure query performance settings
+        var queryPerformanceSettings = configuration.GetSection(QueryPerformanceSettings.SectionName);
+        services.Configure<QueryPerformanceSettings>(queryPerformanceSettings);
+        var slowQueryThreshold = queryPerformanceSettings.GetValue<int?>("SlowQueryThresholdMs") ?? 10;
+        
+        // Register the slow query interceptor
+        services.AddSingleton(sp => 
+            new SlowQueryInterceptor(
+                sp.GetRequiredService<ILogger<SlowQueryInterceptor>>(), 
+                slowQueryThreshold));
+        
+        services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+        {
+            var slowQueryInterceptor = serviceProvider.GetRequiredService<SlowQueryInterceptor>();
+            options.UseNpgsql(connectionString)
+                .AddInterceptors(slowQueryInterceptor);
+        });
 
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IChatRepository, ChatRepository>();
