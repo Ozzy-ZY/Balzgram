@@ -38,12 +38,25 @@ public class ChatRepository : IChatRepository
 
     public async Task<IReadOnlyList<Chat>> GetUserChatsAsync(string userId, CancellationToken cancellationToken = default)
     {
-        return await _context.Chats
+        var query = _context.Chats
             .Where(c => c.Members.Any(m => m.UserId == userId && m.LeftAtUtc == null))
-            .Include(c => c.Messages.OrderByDescending(m => m.SentAtUtc).Take(1))
-            .Include(c => c.Members)
-            .OrderByDescending(c => c.Messages.Max(m => (DateTime?)m.SentAtUtc) ?? c.CreatedAtUtc)
-            .ToListAsync(cancellationToken);
+            .Select(c => new 
+            {
+                Chat = c,
+                // Projection is often more efficient than Include for complex joins
+                LatestMessage = c.Messages
+                    .OrderByDescending(m => m.SentAtUtc)
+                    .FirstOrDefault(),
+                Members = c.Members.ToList()
+            })
+            // Sort by the projected LatestMessage to avoid recalculating the MAX()
+            .OrderByDescending(x => x.LatestMessage != null 
+                ? x.LatestMessage.SentAtUtc 
+                : x.Chat.CreatedAtUtc)
+            .Select(x => x.Chat); // Select the entity back if needed, or return a DTO
+        Console.WriteLine(query.ToQueryString());
+        
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(Chat chat, CancellationToken cancellationToken = default)
