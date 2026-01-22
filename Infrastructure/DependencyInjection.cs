@@ -36,7 +36,13 @@ public static class DependencyInjection
         {
             var slowQueryInterceptor = serviceProvider.GetRequiredService<SlowQueryInterceptor>();
             options.UseNpgsql(connectionString)
-                .AddInterceptors(slowQueryInterceptor);
+                .AddInterceptors(slowQueryInterceptor)
+                .LogTo(Console.WriteLine, LogLevel.Information);
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging();
+            }
         });
 
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
